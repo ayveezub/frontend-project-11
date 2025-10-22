@@ -1,3 +1,9 @@
+import keyBy from 'lodash/keyBy.js'
+import has from 'lodash/has.js'
+import isEmpty from 'lodash/isEmpty.js'
+import onChange from 'on-change'
+import * as yup from 'yup'
+
 const rssFormPage = `
  <main class="flex-grow-1">
    <section class="container-fluid bg-dark p-5">
@@ -47,6 +53,135 @@ const rssFormPage = `
  </main>
 `
 
+const schema = yup.object().shape({
+  url: yup.string().required().url().nullable(),
+})
+
+const validate = (fields) => {
+  try {
+    schema.validateSync(fields, { abortEarly: false })
+    return {}
+  } catch (e) {
+    return keyBy(e.inner, 'path')
+  }
+}
+
+const handleProcessState = (elements, processState) => {
+  switch (processState) {
+    case 'sent':
+      break
+
+    case 'error':
+      break
+
+    case 'sending':
+      break
+
+    case 'filling':
+      elements.form.reset()
+      break
+
+    default:
+      throw new Error(`Unknown process state: ${processState}`)
+  }
+}
+
+const renderFieldError = (elements, fieldElement, error) => {
+  fieldElement.classList.add('is-invalid')
+  elements.feedback.textContent = error.message
+}
+
+const renderErrors = (elements, errors, prevErrors, state) => {
+  Object.entries(elements.fields).forEach(([fieldName, fieldElement]) => {
+    const error = errors[fieldName]
+
+    const fieldHadError = has(prevErrors, fieldName)
+    const fieldHasError = has(errors, fieldName)
+
+    if (!fieldHadError && !fieldHasError) return
+
+    if (fieldHadError && !fieldHasError) {
+      fieldElement.classList.remove('is-invalid')
+      elements.feedback.textContent = ''
+      return
+    }
+
+    if (state.form.fieldsUi.touched[fieldName] && fieldHasError) {
+      renderFieldError(elements, fieldElement, error)
+    }
+  })
+}
+
+const render = (elements, initialState) => (path, value, prevValue) => {
+  switch (path) {
+    case 'addingFeedProcess.processState':
+      handleProcessState(elements, value)
+      break
+
+    case 'form.valid':
+      break
+
+    case 'form.errors':
+      renderErrors(elements, value, prevValue, initialState)
+      break
+
+    default:
+      break
+  }
+}
+
 export default () => {
   document.querySelector('#app').innerHTML = rssFormPage
+  const elements = {
+    form: document.querySelector('.rss-form'),
+    fields: {
+      url: document.getElementById('url-input'),
+    },
+    submitButton: document.querySelector('input[type="submit"]'),
+    feedback: document.querySelector('.feedback'),
+  }
+
+  const initialState = {
+    addingFeedProcess: {
+      processState: 'filling',
+      processError: null,
+    },
+    feeds: { links: [] },
+    form: {
+      valid: true,
+      errors: {},
+      fields: { url: '' },
+      fieldsUi: { touched: { url: false } }
+    }
+  }
+  const state = onChange(initialState, render(elements, initialState))
+
+  Object.entries(elements.fields).forEach(([fieldName, fieldElement]) => {
+    fieldElement.addEventListener('input', (e) => {
+      const { value } = e.target
+      state.form.fields[fieldName] = value
+      state.form.fieldsUi.touched[fieldName] = true
+
+      const errors = validate(state.form.fields)
+      state.form.errors = errors
+      state.form.valid = isEmpty(errors)
+    })
+  })
+
+  elements.form.addEventListener('submit', (e) => {
+    e.preventDefault()
+
+    state.addingFeedProcess.processState = 'sending'
+    state.addingFeedProcess.processError = null
+
+    const data = { url: state.form.fields.url }
+    if (state.feeds.links.includes(data.url)) {
+      state.form.errors = { url: { message: 'RSS уже добавлен' } }
+      return
+    }
+
+    state.feeds.links = [...state.feeds.links, data.url]
+
+    state.addingFeedProcess.processState = 'filling'
+  })
 }

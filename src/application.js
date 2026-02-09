@@ -68,13 +68,13 @@ const validate = (fields) => {
 
 const handleProcessState = (elements, processState) => {
   switch (processState) {
-    case 'sent':
+    case 'success':
       break
 
     case 'error':
       break
 
-    case 'sending':
+    case 'updating':
       break
 
     case 'filling':
@@ -86,12 +86,12 @@ const handleProcessState = (elements, processState) => {
   }
 }
 
-const renderFieldError = (elements, fieldElement, error) => {
+const renderFeedback = (elements, fieldElement, error) => {
   fieldElement.classList.add('is-invalid')
   elements.feedback.textContent = error.message
 }
 
-const renderErrors = (elements, errors, prevErrors, state) => {
+const renderValidationErrors = (elements, errors, prevErrors, state) => {
   Object.entries(elements.fields).forEach(([fieldName, fieldElement]) => {
     const error = errors[fieldName]
 
@@ -107,22 +107,19 @@ const renderErrors = (elements, errors, prevErrors, state) => {
     }
 
     if (state.form.fieldsUi.touched[fieldName] && fieldHasError) {
-      renderFieldError(elements, fieldElement, error)
+      renderFeedback(elements, fieldElement, error)
     }
   })
 }
 
-const render = (elements, initialState) => (path, value, prevValue) => {
+const watch = (elements, originalState) => (path, value, prevValue) => {
   switch (path) {
-    case 'addingFeedProcess.processState':
+    case 'updatingProcess.processState':
       handleProcessState(elements, value)
       break
 
-    case 'form.valid':
-      break
-
-    case 'form.errors':
-      renderErrors(elements, value, prevValue, initialState)
+    case 'form.validationErrors':
+      renderValidationErrors(elements, value, prevValue, originalState)
       break
 
     default:
@@ -141,20 +138,21 @@ export default () => {
     feedback: document.querySelector('.feedback'),
   }
 
-  const initialState = {
-    addingFeedProcess: {
+  const originalState = {
+    updatingProcess: {
       processState: 'filling',
       processError: null,
     },
-    feeds: { links: [] },
+    feedURLs: [],
+    rssContents: [],
     form: {
       valid: true,
-      errors: {},
+      validationErrors: {},
       fields: { url: '' },
       fieldsUi: { touched: { url: false } }
     }
   }
-  const state = onChange(initialState, render(elements, initialState))
+  const state = onChange(originalState, watch(elements, originalState))
 
   Object.entries(elements.fields).forEach(([fieldName, fieldElement]) => {
     fieldElement.addEventListener('input', (e) => {
@@ -163,7 +161,7 @@ export default () => {
       state.form.fieldsUi.touched[fieldName] = true
 
       const errors = validate(state.form.fields)
-      state.form.errors = errors
+      state.form.validationErrors = errors
       state.form.valid = isEmpty(errors)
     })
   })
@@ -171,17 +169,17 @@ export default () => {
   elements.form.addEventListener('submit', (e) => {
     e.preventDefault()
 
-    state.addingFeedProcess.processState = 'sending'
-    state.addingFeedProcess.processError = null
+    state.updatingProcess.processState = 'updating'
+    state.updatingProcess.processError = null
 
     const data = { url: state.form.fields.url }
-    if (state.feeds.links.includes(data.url)) {
-      state.form.errors = { url: { message: 'RSS уже добавлен' } }
+    if (state.feedURLs.includes(data.url)) {
+      state.form.validationErrors = { url: { message: 'RSS уже добавлен' } }
       return
     }
 
-    state.feeds.links = [...state.feeds.links, data.url]
+    state.feedURLs = [...state.feedURLs, data.url]
 
-    state.addingFeedProcess.processState = 'filling'
+    state.updatingProcess.processState = 'filling'
   })
 }

@@ -66,11 +66,66 @@ const validate = (fields) => {
   }
 }
 
+const fetchAllFeeds = (feedURLs) => {
+  const proxy = 'https://allorigins.hexlet.app/get?disable_cache=true&url='
+  const fetchPromises = feedURLs.map(feedURL =>  
+    fetch(`${proxy}${feedURL}`)  
+      .then(response => {    
+        if (!response.ok) {  
+          throw new Error(`Failed to fetch ${feedURL}: ${response.status}`)  
+        }
+        return response.json()
+      })  
+  )
+
+  return Promise.all(fetchPromises)
+}
+
+const extractFeedMeta = (xmlDoc, feedURL) => {
+  const channel = xmlDoc.querySelector('channel')
+  const title = channel.querySelector('title').textContent || 'Untitled feed'
+  const description = channel.querySelector('description').textContent || 'No description'
+
+  return { feedURL, title, description }
+}
+
+const extractFeedItems = (xmlDoc, feedURL) => {
+  const items = xmlDoc.querySelectorAll('item')
+  
+  return Array.from(items).map(item => ({
+    feedURL,
+    title: item.querySelector('title').textContent || 'Untitled post',
+    description: item.querySelector('description').textContent || 'No description',
+    pubDate: item.querySelector('pubDate').textContent || 'Unknown date',
+  }))
+}
+
+const parseRSS = (jsonResponse) => {
+  const parser = new DOMParser()
+  const xmlString = jsonResponse.contents
+  const xmlDoc = parser.parseFromString(xmlString, 'application/xml')
+  const feedURL = jsonResponse.status.url
+
+  const feedMeta = extractFeedMeta(xmlDoc, feedURL)
+  const feedItems = extractFeedItems(xmlDoc, feedURL)
+
+  return { feedMeta, feedItems }
+}
+
+const updateFeeds = (state) => fetchAllFeeds(state.feedURLs)
+  .then(jsonResponses => jsonResponses.map(parseRSS))
+  .then(rssContents => {
+    console.log(rssContents)
+    state.rssContents = rssContents
+    state.updatingProcess.processState = 'filling'
+  })
+  .catch(error => {  
+    state.updatingProcess.processError = error
+    state.updatingProcess.processState = 'error'
+  })
+
 const handleProcessState = (elements, processState) => {
   switch (processState) {
-    case 'success':
-      break
-
     case 'error':
       break
 
@@ -82,7 +137,7 @@ const handleProcessState = (elements, processState) => {
       break
 
     default:
-      throw new Error(`Unknown process state: ${processState}`)
+      throw new Error(`Unknown updating process state: ${processState}`)
   }
 }
 
@@ -168,18 +223,18 @@ export default () => {
 
   elements.form.addEventListener('submit', (e) => {
     e.preventDefault()
-
-    state.updatingProcess.processState = 'updating'
-    state.updatingProcess.processError = null
+    if (state.updatingProcess.processState === 'updating') return
 
     const data = { url: state.form.fields.url }
     if (state.feedURLs.includes(data.url)) {
       state.form.validationErrors = { url: { message: 'RSS уже добавлен' } }
       return
     }
-
     state.feedURLs = [...state.feedURLs, data.url]
 
-    state.updatingProcess.processState = 'filling'
+    state.updatingProcess.processError = null
+    state.updatingProcess.processState = 'updating'
+
+    updateFeeds(state)
   })
 }

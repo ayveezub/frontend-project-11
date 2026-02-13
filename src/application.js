@@ -4,7 +4,7 @@ import isEmpty from 'lodash/isEmpty.js'
 import onChange from 'on-change'
 import * as yup from 'yup'
 
-const rssFormPage = `
+const rssAggregatorFormHTML = `
  <main class="flex-grow-1">
    <section class="container-fluid bg-dark p-5">
      <div class="row">
@@ -49,7 +49,12 @@ const rssFormPage = `
        </div>
      </div>
    </section>
-   <section class="container-fluid container-xxl p-5"></section>
+   <section class="container-fluid container-xxl p-5">
+     <div class="row">
+       <div class="col-md-10 col-lg-8 order-1 mx-auto posts"></div>
+       <div class="col-md-10 col-lg-4 max-auto order-0 order-lg-1 feeds"></div>
+     </div>
+   </section>
  </main>
 `
 
@@ -167,6 +172,95 @@ const renderValidationErrors = (elements, errors, prevErrors, state) => {
   })
 }
 
+const makeTitleCardElement = (cardTitle) => {
+  const div = document.createElement('div')
+  div.className = 'card-body'
+
+  const titleElement = document.createElement('h2')
+  titleElement.className = 'card-title h4'
+  titleElement.textContent = cardTitle
+
+  div.append(titleElement)
+  return div
+}
+
+const makeFeedsMetaLiElement = (feedMeta) => {
+  const { feedURL, title, description } = feedMeta
+
+  const li = document.createElement('li')
+  li.className = 'list-group-item border-0 border-end-0'
+  li.dataset.feedUrl = feedURL
+
+  const h3 = document.createElement('h3')
+  h3.className = 'h6 m-0'
+  h3.textContent = title
+
+  const p = document.createElement('p')
+  p.className = 'm-0 small text-black-50'
+  p.textContent = description
+
+  li.append(h3, p)
+  return li
+}
+
+const makeFeedsMetaUlElement = (rssContents) => {
+  const ul = document.createElement('ul')
+  ul.className = 'list-group border-0 rounded-0'
+
+  const listItems = rssContents
+    .map(({ feedMeta }) => makeFeedsMetaLiElement(feedMeta))
+
+  ul.append(...listItems)
+  return ul
+}
+
+const makePostsLiElement = (feedItem) => {
+  const { feedURL, title, pubDate } = feedItem
+
+  const li = document.createElement('li')
+  li.className
+    = 'list-group-item d-flex justify-content-between align-items-start border-0 border-end-0'
+  
+  const a = document.createElement('a')
+  a.className = 'fw-bold'
+  a.dataset.feedUrl = feedURL
+  a.href = '#'
+  a.textContent = `${title} ${pubDate}`
+
+  li.append(a)
+  return li
+}
+
+const makePostsUlElement = (rssContents) => {
+  const ul = document.createElement('ul')
+  ul.className = 'list-group border-0 rounded-0'
+
+  const listItems = rssContents
+    .flatMap(({ feedItems }) => feedItems)
+    .map(makePostsLiElement)
+
+  ul.append(...listItems)
+  return ul
+}
+
+const renderFeedsMeta = (elements, rssContents) => {
+  const { feedsContainer } = elements
+
+  const titleCard = makeTitleCardElement('Фиды')
+  const ul = makeFeedsMetaUlElement(rssContents)
+
+  feedsContainer.replaceChildren(titleCard, ul)
+}
+
+const renderPosts = (elements, rssContents) => {
+  const { postsContainer } = elements
+
+  const titleCard = makeTitleCardElement('Посты')
+  const ul = makePostsUlElement(rssContents)
+
+  postsContainer.replaceChildren(titleCard, ul)
+}
+
 const watch = (elements, originalState) => (path, value, prevValue) => {
   switch (path) {
     case 'updatingProcess.processState':
@@ -177,13 +271,18 @@ const watch = (elements, originalState) => (path, value, prevValue) => {
       renderValidationErrors(elements, value, prevValue, originalState)
       break
 
+    case 'rssContents':
+      renderFeedsMeta(elements, value)
+      renderPosts(elements, value)
+      break
+
     default:
       break
   }
 }
 
 export default () => {
-  document.querySelector('#app').innerHTML = rssFormPage
+  document.querySelector('#app').innerHTML = rssAggregatorFormHTML
   const elements = {
     form: document.querySelector('.rss-form'),
     fields: {
@@ -191,6 +290,8 @@ export default () => {
     },
     submitButton: document.querySelector('input[type="submit"]'),
     feedback: document.querySelector('.feedback'),
+    postsContainer: document.querySelector('.posts'),
+    feedsContainer: document.querySelector('.feeds'),
   }
 
   const originalState = {

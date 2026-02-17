@@ -117,10 +117,16 @@ const parseRSS = (jsonResponse) => {
   return { feedMeta, feedItems }
 }
 
-const updateFeeds = (state) => fetchAllFeeds(state.feedURLs)
+const updateFeeds = (state) => {
+  if (state.feedURLs.length === 0) return
+  if (state.updatingProcess.processState === 'updating') return
+
+  state.updatingProcess.processError = null
+  state.updatingProcess.processState = 'updating'
+
+  fetchAllFeeds(state.feedURLs)
   .then(jsonResponses => jsonResponses.map(parseRSS))
   .then(rssContents => {
-    console.log(rssContents)
     state.rssContents = rssContents
     state.updatingProcess.processState = 'filling'
   })
@@ -128,6 +134,17 @@ const updateFeeds = (state) => fetchAllFeeds(state.feedURLs)
     state.updatingProcess.processError = error
     state.updatingProcess.processState = 'error'
   })
+}
+
+const autoUpdate = (state) => {
+  try {
+    updateFeeds(state)
+  } catch (error) {
+    console.error('autoUpdate error:', error)
+  } finally {
+    setTimeout(() => autoUpdate(state), 5000)
+  }
+}
 
 const handleProcessState = (elements, processState) => {
   switch (processState) {
@@ -324,7 +341,6 @@ export default () => {
 
   elements.form.addEventListener('submit', (e) => {
     e.preventDefault()
-    if (state.updatingProcess.processState === 'updating') return
 
     const data = { url: state.form.fields.url }
     if (state.feedURLs.includes(data.url)) {
@@ -333,9 +349,8 @@ export default () => {
     }
     state.feedURLs = [...state.feedURLs, data.url]
 
-    state.updatingProcess.processError = null
-    state.updatingProcess.processState = 'updating'
-
     updateFeeds(state)
   })
+
+  document.addEventListener('DOMContentLoaded', () => autoUpdate(state))
 }

@@ -1,5 +1,6 @@
-import { HEXLET_PROXY } from './constants'
 import { parseRSS } from './parsing'
+
+const HEXLET_PROXY = 'https://allorigins.hexlet.app/get?disable_cache=true&url='
 
 const fetchAllFeeds = (feedURLs) => {
   const fetchPromises = feedURLs.map(feedURL =>  

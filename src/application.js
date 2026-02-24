@@ -1,4 +1,4 @@
-import { INITIAL_HOME_PAGE_HTML } from './modules/constants'
+import { makeInitialHomePage } from './modules/uiElements'
 import { validate } from './modules/validation'
 import isEmpty from 'lodash/isEmpty.js'
 import {
@@ -47,7 +47,9 @@ const watch = (elements, originalState) => (path, value, prevValue) => {
 }
 
 export default () => {
-  document.querySelector('#app').innerHTML = INITIAL_HOME_PAGE_HTML
+  const initialHomePage = makeInitialHomePage()
+  document.querySelector('#app').append(initialHomePage)
+
   const elements = {
     form: document.querySelector('.rss-form'),
     fields: {

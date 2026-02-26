@@ -37,8 +37,8 @@ const watch = (elements, originalState) => (path, value, prevValue) => {
       break
 
     case 'rssContents':
-      renderFeedsMeta(elements, value)
-      renderPosts(elements, value)
+      renderFeedsMeta(elements, value, originalState)
+      renderPosts(elements, value, originalState)
       break
 
     default:
@@ -46,8 +46,8 @@ const watch = (elements, originalState) => (path, value, prevValue) => {
   }
 }
 
-export default () => {
-  const initialHomePage = makeInitialHomePage()
+export default (i18nextInstance) => {
+  const initialHomePage = makeInitialHomePage(i18nextInstance)
   document.querySelector('#app').append(initialHomePage)
 
   const elements = {
@@ -73,9 +73,19 @@ export default () => {
       validationErrors: {},
       fields: { url: '' },
       fieldsUi: { touched: { url: false } }
-    }
+    },
+    i18nextInstance,
   }
-  const state = onChange(originalState, watch(elements, originalState))
+
+  const onChangeOptions = {
+    ignoreKeys: ['i18nextInstance'],
+  }
+
+  const state = onChange(
+    originalState,
+    watch(elements, originalState),
+    onChangeOptions
+  )
 
   Object.entries(elements.fields).forEach(([fieldName, fieldElement]) => {
     fieldElement.addEventListener('input', (e) => {

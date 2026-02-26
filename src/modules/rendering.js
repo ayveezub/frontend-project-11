@@ -31,19 +31,21 @@ const renderValidationErrors = (elements, errors, prevErrors, state) => {
   })
 }
 
-const renderFeedsMeta = (elements, rssContents) => {
+const renderFeedsMeta = (elements, rssContents, state) => {
   const { feedsContainer } = elements
+  const title = state.i18nextInstance.t('content.feeds.title')
 
-  const titleCard = makeTitleCardElement('Фиды')
+  const titleCard = makeTitleCardElement(title)
   const ul = makeFeedsMetaUlElement(rssContents)
 
   feedsContainer.replaceChildren(titleCard, ul)
 }
 
-const renderPosts = (elements, rssContents) => {
+const renderPosts = (elements, rssContents, state) => {
   const { postsContainer } = elements
+  const title = state.i18nextInstance.t('content.posts.title')
 
-  const titleCard = makeTitleCardElement('Посты')
+  const titleCard = makeTitleCardElement(title)
   const ul = makePostsUlElement(rssContents)
 
   postsContainer.replaceChildren(titleCard, ul)

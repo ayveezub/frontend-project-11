@@ -1,12 +1,13 @@
-const makeForm = () => {
+const makeForm = (i18nextInstance) => {
+  const i18 = i18nextInstance
   const section = document.createElement('section')
   section.className = 'container-fluid bg-dark p-5'
   section.innerHTML = `
     <div class="row">
       <div class="col-md-10 col-lg-8 mx-auto text-white">
-        <h1 class="display-3 mb-0">RSS Aggregator</h1>
+        <h1 class="display-3 mb-0">${i18.t('app.title')}</h1>
         <p class="lead">
-          Начните читать RSS сегодня! Это легко, это красиво.
+          ${i18.t('app.lead')}
         </p>
         <form class="rss-form text-body" action="">
           <div class="row">
@@ -20,10 +21,10 @@ const makeForm = () => {
                   name="url"
                   aria-label="url"
                   class="form-control w-100"
-                  placeholder="ссылка RSS"
+                  placeholder="${i18.t('form.urlPlaceholder')}"
                   autocomplete="off"
                 >
-                <label for="url-input">Ссылка RSS</label>
+                <label for="url-input">${i18.t('form.urlInput')}</label>
               </div>
             </div>
             <div class="col-auto">
@@ -32,13 +33,13 @@ const makeForm = () => {
                 aria-label="add"
                 class="h-100 btn btn-lg btn-primary px-sm-5"
               >
-                Добавить
+                ${i18.t('form.addFeed')}
               </button>
             </div>
           </div>
         </form>
         <p class="mt-2 mb-0 text-secondary">
-          Пример: https://lorem-rss.hexlet.app/feed
+          ${i18.t('app.exampleURL')}
         </p>
         <p class="feedback m-0 position-absolute small text-danger"></p>
       </div>
@@ -61,26 +62,26 @@ const makeContentContainer = () => {
   return section
 }
 
-const makeInitialHomePage = () => {
+const makeInitialHomePage = (i18nextInstance) => {
   const main = document.createElement('main')
   main.className = 'flex-grow-1'
 
-  const form = makeForm()
+  const form = makeForm(i18nextInstance)
   const contentContainer = makeContentContainer()
 
   main.append(form, contentContainer)
   return main
 }
 
-const makeTitleCardElement = (cardTitle) => {
+const makeTitleCardElement = (title) => {
   const div = document.createElement('div')
   div.className = 'card-body'
 
-  const titleElement = document.createElement('h2')
-  titleElement.className = 'card-title h4'
-  titleElement.textContent = cardTitle
+  const h2 = document.createElement('h2')
+  h2.className = 'card-title h4'
+  h2.textContent = title
 
-  div.append(titleElement)
+  div.append(h2)
   return div
 }
 

@@ -1,4 +1,6 @@
 import './assets/styles/main.css'
-import runApp from './application.js'
+import { i18nextInstance, i18nextInstanceInit } from './i18n.js'
+import app from './application.js'
 
-runApp()
+i18nextInstanceInit()
+  .then(() => app(i18nextInstance))

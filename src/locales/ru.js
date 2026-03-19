@@ -10,8 +10,8 @@ export default {
       urlPlaceholder: 'Ссылка RSS',
       addFeed: 'Добавить',
     },
-    content: {
-      feeds: { title: 'Фиды' },
+    contents: {
+      feedsMeta: { title: 'Фиды' },
       posts: { title: 'Посты' },
     },
   },

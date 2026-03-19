@@ -1,7 +1,8 @@
 import onChange from 'on-change'
 import isEmpty from 'lodash/isEmpty.js'
+import keyBy from 'lodash/keyBy.js'
 import { renderInitialPage, watch } from '../modules/views'
-import { validate } from '../modules/validation'
+import { validateFields } from '../modules/validation'
 import { updateFeeds, autoUpdate } from '../modules/feeds'
 
 export default (state, i18nextInstance) => {
@@ -29,21 +30,23 @@ export default (state, i18nextInstance) => {
       watchedState.form.fields[fieldName] = value
       watchedState.form.fieldsUi.touched[fieldName] = true
 
-      const errors = validate(state.form.fields)
-      watchedState.form.validationErrors = errors
-      watchedState.form.valid = isEmpty(errors)
+      validateFields(state)
+        .then(() => watchedState.form.validationErrors = {})
+        .catch((yupValidationError) => {
+          const errors = keyBy(yupValidationError.inner, 'path')
+          watchedState.form.validationErrors = errors
+        })
+        .finally(() => watchedState.form.valid = isEmpty(state.form.validationErrors))
     })
   })
 
   elements.form.addEventListener('submit', (e) => {
     e.preventDefault()
+    if (!state.form.valid) return
   
     const data = { url: state.form.fields.url }
-    if (state.feedURLs.includes(data.url)) {
-      watchedState.form.validationErrors = { url: { message: 'RSS уже добавлен' } }
-      return
-    }
     watchedState.feedURLs = [...state.feedURLs, data.url]
+    elements.form.reset()
   
     updateFeeds(watchedState)
   })

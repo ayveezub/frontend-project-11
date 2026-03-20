@@ -14,5 +14,16 @@ export default {
       feedsMeta: { title: 'Фиды' },
       posts: { title: 'Посты' },
     },
+    validation : {
+      mixed: {
+        required: 'Не должно быть пустым',
+      },
+      string: {
+        url: 'Ссылка должна быть валидным URL',
+      },
+      custom: {
+        uniqueURL: 'RSS уже добавлен',
+      },
+    }
   },
 }

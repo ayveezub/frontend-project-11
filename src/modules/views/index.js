@@ -2,24 +2,27 @@ import renderInitialPage from './initialPage'
 import { renderValidationErrors } from './feedback'
 import renderFeedsMeta from './feedsMeta'
 import renderPosts from './posts'
+import { state, subscribe } from '../../app/state'
 
-const watch = (elements, state, i18nextInstance) => (path, value, prevValue) => {
-  switch (path) {
-    case 'updatingProcess.processState':
-      break
+const watchForStateChanges = (elements) => subscribe(state, (ops) => {
+  ops.forEach((op) => {
+    const [, path, value, prevValue] = op
+    const pathString = path.join('.')
 
-    case 'form.validationErrors':
-      renderValidationErrors(elements, value, prevValue, state)
-      break
+    switch (pathString) {
+      case 'form.validationErrors':
+        renderValidationErrors(elements, value, prevValue)
+        break
 
-    case 'rssContents':
-      renderFeedsMeta(elements, value, i18nextInstance)
-      renderPosts(elements, value, i18nextInstance)
-      break
+      case 'rssContents':
+        renderFeedsMeta(elements, value)
+        renderPosts(elements, value)
+        break
 
-    default:
-      break
-  }
-}
+      default:
+        break
+    }
+  })
+})
 
-export { renderInitialPage, watch }
+export { renderInitialPage, watchForStateChanges }

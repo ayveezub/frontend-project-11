@@ -1,11 +1,11 @@
 import * as yup from 'yup'
-import { i18nextInstance } from '../../app/i18'
+import { i18nextInstance as i18 } from '../../app/i18'
+import { state, snapshot } from '../../app/state'
 
-const i18 = i18nextInstance
-
-const validateFields = (state) => {
-  const { feedURLs } = state
-  const { fields } = state.form
+const validateFields = () => {
+  const snap = snapshot(state)
+  const { feedURLs } = snap
+  const { fields } = snap.form
 
   const schema = yup.object().shape({
     url: yup.string().required().url().test({

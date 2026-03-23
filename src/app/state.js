@@ -1,4 +1,6 @@
-const state = {
+import { proxy, snapshot, subscribe } from 'valtio/vanilla'
+
+const state = proxy({
   updatingProcess: {
     processState: 'filling',
     processError: null,
@@ -11,6 +13,10 @@ const state = {
     fields: { url: '' },
     fieldsUi: { touched: { url: false } }
   },
-}
+})
 
-export { state }
+export {
+  state,
+  snapshot,
+  subscribe,
+}

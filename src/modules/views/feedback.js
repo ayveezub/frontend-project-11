@@ -1,11 +1,12 @@
 import has from 'lodash/has.js'
+import { state, snapshot } from '../../app/state'
 
 const renderFeedback = (elements, fieldElement, error) => {
   fieldElement.classList.add('is-invalid')
   elements.feedback.textContent = error.message
 }
 
-const renderValidationErrors = (elements, errors, prevErrors, state) => {
+const renderValidationErrors = (elements, errors, prevErrors) => {
   Object.entries(elements.fields).forEach(([fieldName, fieldElement]) => {
     const error = errors[fieldName]
 
@@ -20,7 +21,8 @@ const renderValidationErrors = (elements, errors, prevErrors, state) => {
       return
     }
 
-    if (state.form.fieldsUi.touched[fieldName] && fieldHasError) {
+    const snap = snapshot(state)
+    if (snap.form.fieldsUi.touched[fieldName] && fieldHasError) {
       renderFeedback(elements, fieldElement, error)
     }
   })

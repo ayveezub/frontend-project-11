@@ -1,3 +1,4 @@
+import { i18nextInstance as i18 } from '../../app/i18'
 import { makeTitleCardElement } from './rendererUtils'
 
 const makeFeedsMetaLiElement = (feedMeta) => {
@@ -30,11 +31,10 @@ const makeFeedsMetaUlElement = (rssContents) => {
   return ul
 }
 
-export default (elements, rssContents, i18nextInstance) => {
+export default (elements, rssContents) => {
   const { feedsMetaContainer } = elements
-  const title = i18nextInstance.t('contents.feedsMeta.title')
 
-  const titleCard = makeTitleCardElement(title)
+  const titleCard = makeTitleCardElement(i18.t('contents.feedsMeta.title'))
   const ul = makeFeedsMetaUlElement(rssContents)
 
   feedsMetaContainer.replaceChildren(titleCard, ul)

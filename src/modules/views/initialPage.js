@@ -1,5 +1,6 @@
-const makeForm = (i18nextInstance) => {
-  const i18 = i18nextInstance
+import { i18nextInstance as i18 } from "../../app/i18"
+
+const makeForm = () => {
   const section = document.createElement('section')
   section.className = 'container-fluid bg-dark p-5'
   section.innerHTML = `
@@ -62,11 +63,11 @@ const makeContentsContainer = () => {
   return section
 }
 
-export default (i18nextInstance) => {
+export default () => {
   const main = document.createElement('main')
   main.className = 'flex-grow-1'
 
-  const form = makeForm(i18nextInstance)
+  const form = makeForm()
   const contentsContainer = makeContentsContainer()
 
   main.append(form, contentsContainer)

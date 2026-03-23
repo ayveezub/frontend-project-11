@@ -11,7 +11,7 @@ const i18nextInstanceInit = () => i18nextInstance
   })
 
 const i18 = i18nextInstance
-const yupLocale = {
+const yupCustomLocale = {
   mixed: {
     required: () => i18.t('validation.mixed.required'),
   },
@@ -23,5 +23,5 @@ const yupLocale = {
 export {
   i18nextInstance,
   i18nextInstanceInit,
-  yupLocale,
+  yupCustomLocale,
 }

@@ -1,7 +1,8 @@
 import { fetchAllFeeds } from './fetcher'
 import { parseRSS } from './parser'
+import { state } from '../../app/state'
 
-const updateFeeds = (state) => {
+const updateFeeds = () => {
   if (state.feedURLs.length === 0) return
   if (state.updatingProcess.processState === 'updating') return
 
@@ -20,7 +21,7 @@ const updateFeeds = (state) => {
   })
 }
 
-const autoUpdate = (state) => {
+const autoUpdate = () => {
   try {
     updateFeeds(state)
   } catch (error) {

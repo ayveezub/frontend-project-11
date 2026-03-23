@@ -1,12 +1,12 @@
-import onChange from 'on-change'
 import isEmpty from 'lodash/isEmpty.js'
 import keyBy from 'lodash/keyBy.js'
-import { renderInitialPage, watch } from '../modules/views'
+import { state } from './state'
+import { renderInitialPage, watchForStateChanges } from '../modules/views'
 import { validateFields } from '../modules/validation'
 import { updateFeeds, autoUpdate } from '../modules/feeds'
 
-export default (state, i18nextInstance) => {
-  renderInitialPage(i18nextInstance)
+export default () => {
+  renderInitialPage()
 
   const elements = {
     form: document.querySelector('.rss-form'),
@@ -19,24 +19,22 @@ export default (state, i18nextInstance) => {
     feedsMetaContainer: document.querySelector('.feeds-meta'),
   }
 
-  const watchedState = onChange(
-    state,
-    watch(elements, state, i18nextInstance)
-  )
-
   Object.entries(elements.fields).forEach(([fieldName, fieldElement]) => {
     fieldElement.addEventListener('input', (e) => {
       const { value } = e.target
-      watchedState.form.fields[fieldName] = value
-      watchedState.form.fieldsUi.touched[fieldName] = true
 
-      validateFields(state)
-        .then(() => watchedState.form.validationErrors = {})
+      state.form.fields[fieldName] = value
+      state.form.fieldsUi.touched[fieldName] = true
+
+      validateFields()
+        .then(() => state.form.validationErrors = {})
         .catch((yupValidationError) => {
           const errors = keyBy(yupValidationError.inner, 'path')
-          watchedState.form.validationErrors = errors
+          state.form.validationErrors = errors
         })
-        .finally(() => watchedState.form.valid = isEmpty(state.form.validationErrors))
+        .finally(() => {
+          state.form.valid = isEmpty(state.form.validationErrors)
+        })
     })
   })
 
@@ -45,13 +43,15 @@ export default (state, i18nextInstance) => {
     if (!state.form.valid) return
   
     const data = { url: state.form.fields.url }
-    watchedState.feedURLs = [...state.feedURLs, data.url]
+    state.feedURLs = [...state.feedURLs, data.url]
     elements.form.reset()
   
-    updateFeeds(watchedState)
+    updateFeeds()
   })
 
   document.addEventListener('DOMContentLoaded', () => {
-    autoUpdate(watchedState)
+    autoUpdate()
   })
+
+  watchForStateChanges(elements)
 }

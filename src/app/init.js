@@ -1,12 +1,12 @@
+import { unstable_enableOp } from 'valtio/vanilla'
 import * as yup from 'yup'
-import { state } from './state'
 import {
-  i18nextInstance,
   i18nextInstanceInit,
-  yupLocale,
+  yupCustomLocale,
 } from './i18'
 import app from './App'
 
 export default () => i18nextInstanceInit()
-  .then(() => yup.setLocale(yupLocale))
-  .finally(() => app(state, i18nextInstance))
+  .then(() => yup.setLocale(yupCustomLocale))
+  .then(() => unstable_enableOp(true))
+  .finally(() => app())

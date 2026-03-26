@@ -2,7 +2,7 @@ import { i18nextInstance as i18 } from '../../app/i18'
 import { makeTitleCardElement } from './rendererUtils'
 
 const makePostsLiElement = (feedItem) => {
-  const { feedURL, title, pubDate } = feedItem
+  const { feedURL : feedUrl, title, description, pubDate } = feedItem
 
   const li = document.createElement('li')
   li.className
@@ -10,11 +10,21 @@ const makePostsLiElement = (feedItem) => {
   
   const a = document.createElement('a')
   a.className = 'fw-bold'
-  a.dataset.feedUrl = feedURL
   a.href = '#'
   a.textContent = `${title} ${pubDate}`
 
-  li.append(a)
+  const button = document.createElement('button')
+  button.className = 'btn btn-outline-primary btn-sm modal-show'
+  button.type = 'button'
+  button.textContent = i18.t('contents.posts.preview')
+  Object.assign(button.dataset, {
+    feedUrl,
+    title,
+    description,
+    pubDate,
+  })
+
+  li.append(a, button)
   return li
 }
 

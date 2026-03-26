@@ -49,6 +49,21 @@ export default () => {
     updateFeeds()
   })
 
+  const postPreviewModal = document.getElementById('post-preview-modal')
+  document.querySelectorAll('.modal-close').forEach((button) => {
+    button.addEventListener('click', () => postPreviewModal.close())
+  })
+  document.querySelector('.contents').addEventListener('click', (e) => {
+    if (!e.target.classList.contains('modal-show')) return
+
+    const { title, description } = e.target.dataset
+    document.getElementById('modal-title').textContent = title
+    document.getElementById('modal-body-text').textContent = description
+    document.getElementById('modal-link').href = '#'
+
+    postPreviewModal.showModal()
+  })
+
   document.addEventListener('DOMContentLoaded', () => {
     autoUpdate()
   })

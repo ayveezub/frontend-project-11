@@ -52,7 +52,7 @@ const makeForm = () => {
 
 const makeContentsContainer = () => {
   const section = document.createElement('section')
-  section.className = 'container-fluid container-xxl p-5'
+  section.className = 'container-fluid container-xxl p-5 contents'
   section.innerHTML = `
     <div class="row">
       <div class="col-md-10 col-lg-8 order-1 mx-auto posts"></div>
@@ -63,13 +63,47 @@ const makeContentsContainer = () => {
   return section
 }
 
+const makePostPreviewModal = () => {
+  const dialog = document.createElement('dialog')
+
+  const attrs = { id: 'post-preview-modal' }
+  Object
+    .entries(attrs)
+    .forEach(([key, value]) => dialog.setAttribute(key, value))
+
+  dialog.innerHTML = `
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modal-title"></h5>
+          <button type="button" class="btn-close modal-close" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p id="modal-body-text"></p>
+        </div>
+        <div class="modal-footer">
+          <a href="" class="btn btn-primary" id="modal-link" target="_blank" rel="noopener noreferrer">
+            ${i18.t('postPreviewModal.link')}
+          </a>
+          <button type="button" class="btn btn-secondary modal-close">
+            ${i18.t('postPreviewModal.close')}
+          </button>
+        </div>
+      </div>
+    </div>
+  `
+  
+  return dialog
+}
+
 export default () => {
   const main = document.createElement('main')
   main.className = 'flex-grow-1'
 
   const form = makeForm()
   const contentsContainer = makeContentsContainer()
-
   main.append(form, contentsContainer)
-  document.querySelector('#app').replaceChildren(main)
+
+  const postPreviewModal = makePostPreviewModal()
+  document.querySelector('#app').replaceChildren(main, postPreviewModal)
 }

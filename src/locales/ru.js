@@ -12,7 +12,11 @@ export default {
     },
     contents: {
       feedsMeta: { title: 'Фиды' },
-      posts: { title: 'Посты' },
+      posts: { title: 'Посты', preview: 'Просмотр' },
+    },
+    postPreviewModal: {
+      close: 'Закрыть',
+      link: 'Читать полностью',
     },
     validation : {
       mixed: {

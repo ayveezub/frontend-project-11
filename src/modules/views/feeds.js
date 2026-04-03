@@ -1,12 +1,13 @@
 import { i18nextInstance as i18 } from '../../app/i18'
+import { state, snapshot } from '../../app/state'
 import { makeTitleCardElement } from './rendererUtils'
 
-const makeFeedsMetaLiElement = (feedMeta) => {
-  const { feedURL, title, description } = feedMeta
+const makeFeedsLiElement = (feed) => {
+  const { feedUrl, title, description } = feed
 
   const li = document.createElement('li')
   li.className = 'list-group-item border-0 border-end-0'
-  li.dataset.feedUrl = feedURL
+  li.dataset.feedUrl = feedUrl
 
   const h3 = document.createElement('h3')
   h3.className = 'h6 m-0'
@@ -20,22 +21,24 @@ const makeFeedsMetaLiElement = (feedMeta) => {
   return li
 }
 
-const makeFeedsMetaUlElement = (rssContents) => {
+const makeFeedsUlElement = () => {
+  const snap = snapshot(state)
   const ul = document.createElement('ul')
   ul.className = 'list-group border-0 rounded-0'
 
-  const listItems = rssContents
-    .map(({ feedMeta }) => makeFeedsMetaLiElement(feedMeta))
+  const listItems = snap
+    .feeds
+    .map(makeFeedsLiElement)
 
   ul.append(...listItems)
   return ul
 }
 
-export default (elements, rssContents) => {
-  const { feedsMetaContainer } = elements
+export default (elements) => {
+  const { feedsContainer } = elements
 
-  const titleCard = makeTitleCardElement(i18.t('contents.feedsMeta.title'))
-  const ul = makeFeedsMetaUlElement(rssContents)
+  const titleCard = makeTitleCardElement(i18.t('contents.feeds.title'))
+  const ul = makeFeedsUlElement()
 
-  feedsMetaContainer.replaceChildren(titleCard, ul)
+  feedsContainer.replaceChildren(titleCard, ul)
 }

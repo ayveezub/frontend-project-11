@@ -1,6 +1,6 @@
 import renderInitialPage from './initialPage'
 import { renderValidationErrors } from './feedback'
-import renderFeedsMeta from './feedsMeta'
+import renderFeeds from './feeds'
 import renderPosts from './posts'
 import { state, subscribe } from '../../app/state'
 
@@ -14,9 +14,9 @@ const watchForStateChanges = (elements) => subscribe(state, (ops) => {
         renderValidationErrors(elements, value, prevValue)
         break
 
-      case 'rssContents':
-        renderFeedsMeta(elements, value)
-        renderPosts(elements, value)
+      case 'posts':
+        renderFeeds(elements)
+        renderPosts(elements)
         break
 
       default:

@@ -52,11 +52,11 @@ const makeForm = () => {
 
 const makeContentsContainer = () => {
   const section = document.createElement('section')
-  section.className = 'container-fluid container-xxl p-5 contents'
+  section.className = 'container-fluid container-xxl p-5'
   section.innerHTML = `
     <div class="row">
       <div class="col-md-10 col-lg-8 order-1 mx-auto posts"></div>
-      <div class="col-md-10 col-lg-4 max-auto order-0 order-lg-1 feeds-meta"></div>
+      <div class="col-md-10 col-lg-4 max-auto order-0 order-lg-1 feeds"></div>
     </div>
   `
 
@@ -82,9 +82,9 @@ const makePostPreviewModal = () => {
           <p id="modal-body-text"></p>
         </div>
         <div class="modal-footer">
-          <a href="" class="btn btn-primary" id="modal-link" target="_blank" rel="noopener noreferrer">
+          <button type="button" class="btn btn-primary" id="modal-link">
             ${i18.t('postPreviewModal.link')}
-          </a>
+          </button>
           <button type="button" class="btn btn-secondary modal-close">
             ${i18.t('postPreviewModal.close')}
           </button>

@@ -11,7 +11,7 @@ export default {
       addFeed: 'Добавить',
     },
     contents: {
-      feedsMeta: { title: 'Фиды' },
+      feeds: { title: 'Фиды' },
       posts: { title: 'Посты', preview: 'Просмотр' },
     },
     postPreviewModal: {
@@ -26,7 +26,7 @@ export default {
         url: 'Ссылка должна быть валидным URL',
       },
       custom: {
-        uniqueURL: 'RSS уже добавлен',
+        uniqueURL: 'RSS уже существует',
       },
     }
   },

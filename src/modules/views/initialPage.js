@@ -10,7 +10,7 @@ const makeForm = () => {
         <p class="lead">
           ${i18.t('app.lead')}
         </p>
-        <form class="rss-form text-body" action="">
+        <form class="rss-form text-body" action="" autocomplete="off">
           <div class="row">
             <div class="col">
               <div class="form-floating">

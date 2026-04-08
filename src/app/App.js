@@ -52,6 +52,7 @@ export default () => {
     }
     state.feeds = [newFeed, ...state.feeds]
     elements.form.reset()
+    elements.fields.url.focus()
   
     try {
       updateFeedsAndPosts()

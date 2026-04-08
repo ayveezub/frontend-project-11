@@ -18,7 +18,7 @@ export default {
       close: 'Закрыть',
       link: 'Читать полностью',
     },
-    validation : {
+    validation: {
       mixed: {
         required: 'Не должно быть пустым',
       },
@@ -28,6 +28,15 @@ export default {
       custom: {
         uniqueURL: 'RSS уже существует',
       },
-    }
+    },
+    feedback: {
+      feeds: {
+        successfullyAdded: 'RSS успешно загружен',
+        errors: {
+          fetch: 'Ошибка сети',
+          parse: 'Ресурс не содержит валидный RSS',
+        },
+      },
+    },
   },
 }

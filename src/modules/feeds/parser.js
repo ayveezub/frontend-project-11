@@ -1,4 +1,5 @@
 import uniqueId from 'lodash/uniqueId.js'
+import { i18nextInstance as i18 } from '../../app/i18'
 
 const extractFeedMeta = (xmlDoc, feedUrl) => {
   const channel = xmlDoc.querySelector('channel')
@@ -27,8 +28,11 @@ const parseRSS = (jsonResponse) => {
   const parser = new DOMParser()
   const xmlString = jsonResponse.contents
   const xmlDoc = parser.parseFromString(xmlString, 'application/xml')
-  const feedUrl = jsonResponse.status.url
+  if (xmlDoc.querySelector('parsererror')) {
+    throw new Error(i18.t('feedback.feeds.errors.parse'))
+  }
 
+  const feedUrl = jsonResponse.status.url
   const feedMeta = extractFeedMeta(xmlDoc, feedUrl)
   const feedItems = extractFeedItems(xmlDoc, feedUrl)
 

@@ -1,6 +1,6 @@
 import isEmpty from 'lodash/isEmpty.js'
 import keyBy from 'lodash/keyBy.js'
-import { state } from './state'
+import { state, newProcessStatus } from './state'
 import { renderInitialPage, watchForStateChanges } from '../modules/views'
 import { validateFields } from '../modules/validation'
 import { autoUpdate, updateFeedsAndPosts } from '../modules/feeds'
@@ -53,7 +53,13 @@ export default () => {
     state.feeds = [newFeed, ...state.feeds]
     elements.form.reset()
   
-    updateFeedsAndPosts()
+    try {
+      updateFeedsAndPosts()
+    } finally {
+      if (!state.updatingProcess.error) {
+        state.updatingProcess = newProcessStatus('successfullyAdded')
+      }
+    }
   })
 
   const postPreviewModal = document.getElementById('post-preview-modal')

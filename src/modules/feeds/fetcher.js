@@ -1,3 +1,5 @@
+import { i18nextInstance as i18 } from '../../app/i18'
+
 const HEXLET_PROXY = 'https://allorigins.hexlet.app/get?disable_cache=true&url='
 
 const proxyfy = (url) => `${HEXLET_PROXY}${encodeURIComponent(url)}`
@@ -21,7 +23,7 @@ const fetchAllFeeds = (feeds) => {
         if (response.ok) {
           return response.json()
         }
-        throw new Error(`Failed to fetch ${feedUrl}: ${response.status}`)
+        throw new Error(i18.t('feedback.feeds.errors.fetch'))
       })  
   })
 

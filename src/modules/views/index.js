@@ -1,5 +1,5 @@
 import renderInitialPage from './initialPage'
-import { renderValidationErrors } from './feedback'
+import { renderFeedback, renderValidationErrors } from './feedback'
 import renderFeeds from './feeds'
 import renderPosts from './posts'
 import { state, subscribe } from '../../app/state'
@@ -17,6 +17,10 @@ const watchForStateChanges = (elements) => subscribe(state, (ops) => {
       case 'posts':
         renderFeeds(elements)
         renderPosts(elements)
+        break
+
+      case 'updatingProcess':
+        renderFeedback(elements, value)
         break
 
       default:

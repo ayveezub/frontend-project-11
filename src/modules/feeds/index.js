@@ -1,6 +1,6 @@
 import { fetchAllFeeds } from './fetcher'
 import { parseRSS } from './parser'
-import { state } from '../../app/state'
+import { state, newProcessStatus } from '../../app/state'
 
 const extractFreshPosts = (feedMeta, feedItems) => {
   const feed = state.getFeedByUrl(feedMeta.feedUrl)
@@ -23,10 +23,9 @@ const updateFeed = (feedMeta) => {
 const updateFeedsAndPosts = () => {
   const { feeds } = state
   if (feeds.length === 0) return
-  if (state.updatingProcess.processState === 'updating') return
+  if (state.updatingProcess.state === 'updating') return
 
-  state.updatingProcess.processError = null
-  state.updatingProcess.processState = 'updating'
+  state.updatingProcess = newProcessStatus('updating')
 
   fetchAllFeeds(feeds)
   .then(jsonResponses => jsonResponses
@@ -45,20 +44,16 @@ const updateFeedsAndPosts = () => {
     const newPosts = allFreshPosts.flat()
 
     state.posts = [...newPosts, ...state.posts]
-    state.updatingProcess.processError = null
-    state.updatingProcess.processState = 'filling'
+    state.updatingProcess = newProcessStatus('filling')
   })
   .catch(error => {  
-    state.updatingProcess.processError = error
-    state.updatingProcess.processState = 'error'
+    state.updatingProcess = newProcessStatus('error', error)
   })
 }
 
 const autoUpdate = () => {
   try {
     updateFeedsAndPosts()
-  } catch (error) {
-    console.error('autoUpdate error:', error)
   } finally {
     setTimeout(() => autoUpdate(), 5000)
   }

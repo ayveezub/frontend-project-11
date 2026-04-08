@@ -2,8 +2,8 @@ import { proxy, snapshot, subscribe, ref } from 'valtio/vanilla'
 
 const state = proxy({
   updatingProcess: {
-    processState: 'filling',
-    processError: null,
+    state: 'filling',
+    error: null,
   },
   feeds: [],
   posts: [],
@@ -24,8 +24,14 @@ const state = proxy({
   }),
 })
 
+const newProcessStatus = (state, error = null) => ({
+  state,
+  error,
+})
+
 export {
   state,
   snapshot,
   subscribe,
+  newProcessStatus,
 }

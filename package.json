@@ -1,7 +1,7 @@
 {
   "name": "@hexlet/code",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "RSS feed aggregation app",
   "main": "src/main.js",
   "author": "Aleksey Zubkov",

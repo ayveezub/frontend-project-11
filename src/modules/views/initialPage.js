@@ -33,6 +33,7 @@ const makeForm = () => {
                 type="submit"
                 aria-label="add"
                 class="h-100 btn btn-lg btn-primary px-sm-5"
+                id="submit-button"
               >
                 ${i18.t('form.addFeed')}
               </button>

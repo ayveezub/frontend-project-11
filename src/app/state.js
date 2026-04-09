@@ -2,7 +2,7 @@ import { proxy, snapshot, subscribe, ref } from 'valtio/vanilla'
 
 const state = proxy({
   updatingProcess: {
-    state: 'filling',
+    state: 'idle',
     error: null,
   },
   feeds: [],
@@ -24,14 +24,8 @@ const state = proxy({
   }),
 })
 
-const newProcessStatus = (state, error = null) => ({
-  state,
-  error,
-})
-
 export {
   state,
   snapshot,
   subscribe,
-  newProcessStatus,
 }

@@ -2,18 +2,45 @@ import has from 'lodash/has.js'
 import { i18nextInstance as i18 } from '../../app/i18'
 import { state, snapshot } from '../../app/state'
 
+const disableForm = (elements) => {
+  elements.submitButton.disabled = true
+  elements.fields.url.disabled = true
+}
+
+const enableForm = (elements) => {
+  elements.submitButton.removeAttribute('disabled')
+  elements.fields.url.removeAttribute('disabled')
+  elements.fields.url.focus()
+}
+
 const renderFeedback = (elements, process) => {
-  if (process.state === 'error') {
-    elements.feedback.classList.remove('text-success')
-    elements.feedback.classList.add('text-danger')
-    elements.feedback.textContent = process.error.message
-    return
-  }
-  if (process.state === 'successfullyAdded') {
-    elements.feedback.classList.remove('text-danger')
-    elements.feedback.classList.add('text-success')
-    elements.feedback.textContent = i18.t('feedback.feeds.successfullyAdded')
-    return
+  switch (process.state) {
+    case 'idle':
+      enableForm(elements)
+      break
+
+    case 'updating':
+      disableForm(elements)
+      break
+
+    case 'error':
+      elements.feedback.classList.remove('text-success')
+      elements.feedback.classList.add('text-danger')
+      elements.feedback.textContent = process.error.message
+
+      enableForm(elements)
+      break
+
+    case 'success':
+      elements.feedback.classList.remove('text-danger')
+      elements.feedback.classList.add('text-success')
+      elements.feedback.textContent = i18.t('feeds.update.success')
+
+      enableForm(elements)
+      break
+
+    default:
+      break
   }
 }
 

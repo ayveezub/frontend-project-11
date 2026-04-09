@@ -29,14 +29,12 @@ export default {
         uniqueURL: 'RSS уже существует',
       },
     },
-    feedback: {
-      feeds: {
-        successfullyAdded: 'RSS успешно загружен',
-        errors: {
-          fetch: 'Ошибка сети',
-          parse: 'Ресурс не содержит валидный RSS',
-        },
-      },
+    feeds: {
+      update: { success: 'RSS успешно загружен' },
+    },
+    errors: {
+      network: 'Ошибка сети',
+      parse: 'Ресурс не содержит валидный RSS',
     },
   },
 }

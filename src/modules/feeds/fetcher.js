@@ -23,8 +23,14 @@ const fetchAllFeeds = (feeds) => {
         if (response.ok) {
           return response.json()
         }
-        throw new Error(i18.t('feedback.feeds.errors.fetch'))
-      })  
+        throw new Error(i18.t('errors.network'))
+      })
+      .catch(error => {
+        if (error instanceof TypeError) {
+          throw new Error(i18.t('errors.network'))
+        }
+        throw error
+      })
   })
 
   return Promise.all(fetchPromises)

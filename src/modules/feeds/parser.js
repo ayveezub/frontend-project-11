@@ -25,11 +25,13 @@ const extractFeedItems = (xmlDoc, feedUrl) => {
 }
 
 const parseRSS = (jsonResponse) => {
-  const parser = new DOMParser()
   const xmlString = jsonResponse.contents
+  if (!xmlString) return null
+
+  const parser = new DOMParser()
   const xmlDoc = parser.parseFromString(xmlString, 'application/xml')
   if (xmlDoc.querySelector('parsererror')) {
-    throw new Error(i18.t('feedback.feeds.errors.parse'))
+    throw new Error(i18.t('errors.parse'))
   }
 
   const feedUrl = jsonResponse.status.url

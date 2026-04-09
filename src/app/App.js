@@ -1,6 +1,6 @@
 import isEmpty from 'lodash/isEmpty.js'
 import keyBy from 'lodash/keyBy.js'
-import { state, newProcessStatus } from './state'
+import { state } from './state'
 import { renderInitialPage, watchForStateChanges } from '../modules/views'
 import { validateFields } from '../modules/validation'
 import { autoUpdate, updateFeedsAndPosts } from '../modules/feeds'
@@ -13,7 +13,7 @@ export default () => {
     fields: {
       url: document.getElementById('url-input'),
     },
-    submitButton: document.querySelector('input[type="submit"]'),
+    submitButton: document.getElementById('submit-button'),
     feedback: document.querySelector('.feedback'),
     postsContainer: document.querySelector('.posts'),
     feedsContainer: document.querySelector('.feeds'),
@@ -21,6 +21,7 @@ export default () => {
 
   Object.entries(elements.fields).forEach(([fieldName, fieldElement]) => {
     fieldElement.addEventListener('input', (e) => {
+      e.target.value = e.target.value.trim()
       const { value } = e.target
 
       state.form.fields[fieldName] = value
@@ -53,14 +54,8 @@ export default () => {
     state.feeds = [newFeed, ...state.feeds]
     elements.form.reset()
     elements.fields.url.focus()
-  
-    try {
-      updateFeedsAndPosts()
-    } finally {
-      if (!state.updatingProcess.error) {
-        state.updatingProcess = newProcessStatus('successfullyAdded')
-      }
-    }
+
+    updateFeedsAndPosts()
   })
 
   const postPreviewModal = document.getElementById('post-preview-modal')

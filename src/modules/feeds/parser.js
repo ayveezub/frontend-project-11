@@ -26,11 +26,8 @@ const extractFeedItems = (xmlDoc, feedUrl) => {
   }))
 }
 
-const parseRSS = (result, feedUrl) => {
+const parseRSS = (xmlString, feedUrl) => {
   try {
-    const xmlString = result.value?.contents
-    if (!xmlString) throw new Error
-
     const parser = new DOMParser()
     const xmlDoc = parser.parseFromString(xmlString, 'application/xml')
     if (xmlDoc.querySelector('parsererror')) throw new Error

@@ -1,4 +1,4 @@
-import { fetchAllFeeds, handleNetworkErrors } from './fetcher'
+import { fetchAllFeeds } from './fetcher'
 import { parseRSS } from './parser'
 import { state } from '../../app/state'
 
@@ -32,12 +32,11 @@ const updateFeedsAndPosts = () => {
   state.updatingProcess = newProcessStatus('updating')
 
   fetchAllFeeds(feeds)
-  .then(results => results.map(handleNetworkErrors))
   .then(results => results.map((result, index) => {
     if (result.status === 'rejected') return result
 
     const { feedUrl } = feeds.at(index)
-    return parseRSS(result, feedUrl)
+    return parseRSS(result.value, feedUrl)
   }))
   .then(parsedResults => {
     const errors = parsedResults

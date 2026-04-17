@@ -1,4 +1,4 @@
-import { fetchAllFeeds } from './fetcher'
+import { fetchAllFeeds, handleNetworkErrors } from './fetcher'
 import { parseRSS } from './parser'
 import { state } from '../../app/state'
 
@@ -10,9 +10,9 @@ const extractFreshPosts = (feedMeta, feedItems) => {
     .filter(({ pubDate }) => pubDate.getTime() > lastModified.getTime())
 }
 
-const newProcessStatus = (state, error = null) => ({
+const newProcessStatus = (state, errors = null) => ({
   state,
-  error,
+  errors,
 })
 
 const updateFeed = (feedMeta) => {
@@ -32,31 +32,36 @@ const updateFeedsAndPosts = () => {
   state.updatingProcess = newProcessStatus('updating')
 
   fetchAllFeeds(feeds)
-  .then(jsonResponses => jsonResponses
-    .filter(Boolean)
-    .map(parseRSS)
-  )
-  .then(contents => contents
-    .filter(Boolean)
-    .map(({ feedMeta, feedItems }) => {
-      const freshPosts = extractFreshPosts(feedMeta, feedItems)
+  .then(results => results.map(handleNetworkErrors))
+  .then(results => results.map((result, index) => {
+    if (result.status === 'rejected') return result
 
-      updateFeed(feedMeta)
-      return freshPosts
-    })
-  )
-  .then(allFreshPosts => {
-    const newPosts = allFreshPosts.flat()
-    if (newPosts.length === 0) {
+    const { feedUrl } = feeds.at(index)
+    return parseRSS(result, feedUrl)
+  }))
+  .then(parsedResults => {
+    const errors = parsedResults
+      .filter(({ status }) => status === 'rejected')
+      .map(({ reason }) => reason)
+
+    const allFreshPosts = parsedResults
+      .filter(({ status }) => status === 'fulfilled')
+      .flatMap(parsedResult => {
+        const { feedMeta, feedItems } = parsedResult.value
+        const freshPosts = extractFreshPosts(feedMeta, feedItems)
+
+        updateFeed(feedMeta)
+        return freshPosts
+      })
+
+    if (allFreshPosts.length === 0 && errors.length === 0) {
       state.updatingProcess = newProcessStatus('idle')
       return
     }
-
-    state.posts = [...newPosts, ...state.posts]
-    state.updatingProcess = newProcessStatus('success')
-  })
-  .catch(error => {  
-    state.updatingProcess = newProcessStatus('error', error)
+    state.posts = [...allFreshPosts, ...state.posts]
+    errors.length === 0
+      ? state.updatingProcess = newProcessStatus('success')
+      : state.updatingProcess = newProcessStatus('error', errors)
   })
 }
 

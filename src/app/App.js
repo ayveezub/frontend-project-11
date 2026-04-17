@@ -4,6 +4,7 @@ import { state } from './state'
 import { renderInitialPage, watchForStateChanges } from '../modules/views'
 import { validateFields } from '../modules/validation'
 import { autoUpdate, updateFeedsAndPosts } from '../modules/feeds'
+import '../assets/styles/main.css'
 
 export default () => {
   renderInitialPage()
@@ -41,6 +42,7 @@ export default () => {
 
   elements.form.addEventListener('submit', (e) => {
     e.preventDefault()
+    if (state.updatingProcess.state === 'updating') return
     if (!state.form.valid) return
   
     const data = { url: state.form.fields.url }
@@ -53,7 +55,6 @@ export default () => {
     }
     state.feeds = [newFeed, ...state.feeds]
     elements.form.reset()
-    elements.fields.url.focus()
 
     updateFeedsAndPosts()
   })

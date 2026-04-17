@@ -3,7 +3,7 @@ import { proxy, snapshot, subscribe, ref } from 'valtio/vanilla'
 const state = proxy({
   updatingProcess: {
     state: 'idle',
-    error: null,
+    errors: null,
   },
   feeds: [],
   posts: [],

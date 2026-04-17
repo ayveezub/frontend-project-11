@@ -5,7 +5,7 @@ const HEXLET_PROXY = 'https://allorigins.hexlet.app/get?disable_cache=true&url='
 const proxyfy = (url) => `${HEXLET_PROXY}${encodeURIComponent(url)}`
 
 const fetchAllFeeds = (feeds) => {
-  const fetchPromises = feeds.map(feed => {
+  const promises = feeds.map(feed => {
     const { feedUrl } = feed
     const fetchOptions = {
       method: 'GET',
@@ -18,22 +18,24 @@ const fetchAllFeeds = (feeds) => {
       redirect: 'follow',
     }
   
-    return fetch(proxyfy(feedUrl), fetchOptions)  
-      .then(response => {
-        if (response.ok) {
-          return response.json()
-        }
-        throw new Error(i18.t('errors.network'))
-      })
-      .catch(error => {
-        if (error instanceof TypeError) {
-          throw new Error(i18.t('errors.network'))
-        }
-        throw error
-      })
+    return fetch(proxyfy(feedUrl), fetchOptions)
+      .then(response => response.json())
   })
 
-  return Promise.all(fetchPromises)
+  return Promise.allSettled(promises)
 }
 
-export { fetchAllFeeds }
+const handleNetworkErrors = (result) => {
+  if (
+    result.status === 'fulfilled'
+    && result.value.status.http_code >= 200
+    && result.value.status.http_code <= 299
+  ) return result
+
+  return ({
+    status: 'rejected',
+    reason: new Error(i18.t('errors.network')),
+  })
+}
+
+export { fetchAllFeeds, handleNetworkErrors }

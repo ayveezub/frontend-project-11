@@ -67,7 +67,7 @@ const makeContentsContainer = () => {
 const makePostPreviewModal = () => {
   const dialog = document.createElement('dialog')
 
-  const attrs = { id: 'post-preview-modal' }
+  const attrs = { id: 'modal' }
   Object
     .entries(attrs)
     .forEach(([key, value]) => dialog.setAttribute(key, value))

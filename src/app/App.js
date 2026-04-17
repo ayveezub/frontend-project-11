@@ -59,7 +59,7 @@ export default () => {
     updateFeedsAndPosts()
   })
 
-  const postPreviewModal = document.getElementById('post-preview-modal')
+  const postPreviewModal = document.getElementById('modal')
   document.getElementById('modal-link').addEventListener('click', (e) => {
     const { link } = e.target.dataset
     window.open(link)

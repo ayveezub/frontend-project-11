@@ -1,8 +1,9 @@
 import { i18nextInstance as i18 } from '../../app/i18'
 
-const HEXLET_PROXY = 'https://allorigins.hexlet.app/get?disable_cache=true&url='
+const CORS_PROXY = 'https://allorigins.hexlet.app'
 
-const proxyfy = (url) => `${HEXLET_PROXY}${encodeURIComponent(url)}`
+const proxyfy
+  = (url) => `${CORS_PROXY}/get?disableCache=true&url=${encodeURIComponent(url)}`
 
 const fetchAllFeeds = (feeds) => {
   const fetchPromises = feeds.map(feed => {
@@ -10,7 +11,7 @@ const fetchAllFeeds = (feeds) => {
     const fetchOptions = {
       method: 'GET',
       headers: {
-        'Accept': 'application/xml, text/xml, application/rss+xml, application/atom+xml, */*',
+        'Accept': 'application/json',
       },
       mode: 'cors',
       credentials: 'omit',

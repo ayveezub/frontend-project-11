@@ -24,6 +24,13 @@ const watchForStateChanges = (elements) => subscribe(state, (ops) => {
         break
 
       default:
+        if (
+          pathString.startsWith('posts.')
+          && pathString.endsWith('.touched')
+        ) {
+          renderPosts(elements)
+          break
+        }
         break
     }
   })

@@ -10,7 +10,7 @@ const makePostsLiElement = (post) => {
     = 'list-group-item d-flex justify-content-between align-items-start border-0 border-end-0'
   
   const a = document.createElement('a')
-  a.className = touched ? 'fw-normal' : 'fw-bold'
+  a.className = touched ? 'link-secondary' : 'fw-bold'
   a.href = link
   a.textContent = `${title} ${pubDate.toUTCString()}`
 
@@ -37,7 +37,7 @@ const makePostsUlElement = () => {
   return ul
 }
 
-export default (elements) => {
+const renderPosts = (elements) => {
   const { postsContainer } = elements
 
   const titleCard = makeTitleCardElement(i18.t('contents.posts.title'))
@@ -45,3 +45,20 @@ export default (elements) => {
 
   postsContainer.replaceChildren(titleCard, ul)
 }
+
+const renderPostPreviewModal = (elements, post) => {
+  elements.modalElements.title.classList.remove('fw-bold')
+  elements.modalElements.title.classList.remove('fw-normal')
+
+  const { title, link, description, touched } = post
+
+  elements.modalElements.title.textContent = title
+  touched
+    ? elements.modalElements.title.classList.add('fw-normal')
+    : elements.modalElements.title.classList.add('fw-bold')
+
+  elements.modalElements.text.textContent = description
+  elements.modalElements.link.dataset.link = link
+}
+
+export { renderPosts, renderPostPreviewModal }

@@ -1,39 +1,38 @@
 import renderInitialPage from './initialPage'
 import { renderFeedback, renderValidationErrors } from './feedback'
 import renderFeeds from './feeds'
-import renderPosts from './posts'
+import { renderPosts, renderPostPreviewModal } from './posts'
 import { state, subscribe } from '../../app/state'
 
 const watchForStateChanges = (elements) => subscribe(state, (ops) => {
   ops.forEach((op) => {
     const [, path, value, prevValue] = op
     const pathString = path.join('.')
-
-    switch (pathString) {
-      case 'form.validationErrors':
-        renderValidationErrors(elements, value, prevValue)
-        break
-
-      case 'posts':
-        renderFeeds(elements)
-        renderPosts(elements)
-        break
-
-      case 'updatingProcess':
-        renderFeedback(elements, value)
-        break
-
-      default:
-        if (
-          pathString.startsWith('posts.')
-          && pathString.endsWith('.touched')
-        ) {
-          renderPosts(elements)
-          break
-        }
-        break
+    if (pathString === 'form.validationErrors') {
+      renderValidationErrors(elements, value, prevValue)
+      return
+    }
+    if (
+      pathString.startsWith('posts.')
+      && pathString.endsWith('.touched')
+    ) {
+      renderPosts(elements)
+      return
+    }
+    if (pathString === 'posts') {
+      renderFeeds(elements)
+      renderPosts(elements)
+      return
+    }
+    if (pathString === 'updatingProcess') {
+      renderFeedback(elements, value)
+      return
     }
   })
 })
 
-export { renderInitialPage, watchForStateChanges }
+export {
+  renderInitialPage,
+  renderPostPreviewModal,
+  watchForStateChanges,
+}

@@ -1,7 +1,11 @@
 import isEmpty from 'lodash/isEmpty.js'
 import keyBy from 'lodash/keyBy.js'
 import { state } from './state'
-import { renderInitialPage, watchForStateChanges } from '../modules/views'
+import {
+  renderInitialPage,
+  renderPostPreviewModal,
+  watchForStateChanges,
+} from '../modules/views'
 import { validateFields } from '../modules/validation'
 import { autoUpdate, updateFeedsAndPosts } from '../modules/feeds'
 import '../assets/styles/main.css'
@@ -18,6 +22,12 @@ export default () => {
     feedback: document.querySelector('.feedback'),
     postsContainer: document.querySelector('.posts'),
     feedsContainer: document.querySelector('.feeds'),
+    modal: document.getElementById('modal'),
+    modalElements: {
+      title: document.getElementById('modal-title'),
+      text: document.getElementById('modal-body-text'),
+      link: document.getElementById('modal-link'),
+    }
   }
 
   Object.entries(elements.fields).forEach(([fieldName, fieldElement]) => {
@@ -59,28 +69,30 @@ export default () => {
     updateFeedsAndPosts()
   })
 
-  const postPreviewModal = document.getElementById('modal')
-  document.getElementById('modal-link').addEventListener('click', (e) => {
-    const { link } = e.target.dataset
-    window.open(link)
-    postPreviewModal.close()
+  elements.modal.addEventListener('click', (e) => {
+    if (e.target.classList.contains('modal-close')) {
+      elements.modal.close()
+      return
+    }
+    if (e.target === elements.modalElements.link) {
+      const { link } = e.target.dataset
+
+      window.open(link)
+      elements.modal.close()
+      return
+    }
   })
-  document.querySelectorAll('.modal-close').forEach((button) => {
-    button.addEventListener('click', () => postPreviewModal.close())
-  })
+
   elements.postsContainer.addEventListener('click', (e) => {
     if (!e.target.classList.contains('modal-show')) return
 
     const { id } = e.target.dataset
     const post = state.getPostById(id)
-    const { title, description, link } = post
 
-    document.getElementById('modal-title').textContent = title
-    document.getElementById('modal-body-text').textContent = description
-    document.getElementById('modal-link').dataset.link = link
-
+    renderPostPreviewModal(elements, post)
+    elements.modal.showModal()
+    elements.modalElements.link.focus()
     post.touched = true
-    postPreviewModal.showModal()
   })
 
   document.addEventListener('DOMContentLoaded', () => {

@@ -11,7 +11,7 @@ const state = proxy({
     valid: true,
     validationErrors: {},
     fields: { url: '' },
-    fieldsUi: { touched: { url: false } }
+    fieldsUi: { touched: { url: false } },
   },
   getFeedByUrl: ref((url) => {
     return state.feeds.find(({ feedUrl }) => feedUrl === url)

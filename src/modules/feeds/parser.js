@@ -3,7 +3,7 @@ import { i18nextInstance as i18 } from '../../app/i18'
 
 const extractFeedMeta = (xmlDoc, feedUrl) => {
   const channel = xmlDoc.querySelector('channel')
-  if (!channel) throw new Error
+  if (!channel) throw new Error()
 
   const title = channel.querySelector('title')?.textContent || 'Untitled feed'
   const link = channel.querySelector('link')?.textContent || '#'
@@ -14,7 +14,7 @@ const extractFeedMeta = (xmlDoc, feedUrl) => {
 
 const extractFeedItems = (xmlDoc, feedUrl) => {
   const items = xmlDoc.querySelectorAll('item')
-  
+
   return Array.from(items).map(item => ({
     id: uniqueId('post-'),
     feedUrl,
@@ -30,7 +30,7 @@ const parseRSS = (xmlString, feedUrl) => {
   try {
     const parser = new DOMParser()
     const xmlDoc = parser.parseFromString(xmlString, 'application/xml')
-    if (xmlDoc.querySelector('parsererror')) throw new Error
+    if (xmlDoc.querySelector('parsererror')) throw new Error()
 
     const feedMeta = extractFeedMeta(xmlDoc, feedUrl)
     const feedItems = extractFeedItems(xmlDoc, feedUrl)
@@ -39,7 +39,8 @@ const parseRSS = (xmlString, feedUrl) => {
       status: 'fulfilled',
       value: { feedMeta, feedItems },
     })
-  } catch {
+  }
+  catch {
     return ({
       status: 'rejected',
       reason: new Error(i18.t('errors.parse')),

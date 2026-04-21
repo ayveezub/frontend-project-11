@@ -32,42 +32,43 @@ const updateFeedsAndPosts = () => {
   state.updatingProcess = newProcessStatus('updating')
 
   fetchAllFeeds(feeds)
-  .then(results => results.map((result, index) => {
-    if (result.status === 'rejected') return result
+    .then(results => results.map((result, index) => {
+      if (result.status === 'rejected') return result
 
-    const { feedUrl } = feeds.at(index)
-    return parseRSS(result.value, feedUrl)
-  }))
-  .then(parsedResults => {
-    const errors = parsedResults
-      .filter(({ status }) => status === 'rejected')
-      .map(({ reason }) => reason)
+      const { feedUrl } = feeds.at(index)
+      return parseRSS(result.value, feedUrl)
+    }))
+    .then((parsedResults) => {
+      const errors = parsedResults
+        .filter(({ status }) => status === 'rejected')
+        .map(({ reason }) => reason)
 
-    const allFreshPosts = parsedResults
-      .filter(({ status }) => status === 'fulfilled')
-      .flatMap(parsedResult => {
-        const { feedMeta, feedItems } = parsedResult.value
-        const freshPosts = extractFreshPosts(feedMeta, feedItems)
+      const allFreshPosts = parsedResults
+        .filter(({ status }) => status === 'fulfilled')
+        .flatMap((parsedResult) => {
+          const { feedMeta, feedItems } = parsedResult.value
+          const freshPosts = extractFreshPosts(feedMeta, feedItems)
 
-        updateFeed(feedMeta)
-        return freshPosts
-      })
+          updateFeed(feedMeta)
+          return freshPosts
+        })
 
-    if (allFreshPosts.length === 0 && errors.length === 0) {
-      state.updatingProcess = newProcessStatus('idle')
-      return
-    }
-    state.posts = [...allFreshPosts, ...state.posts]
-    errors.length === 0
-      ? state.updatingProcess = newProcessStatus('success')
-      : state.updatingProcess = newProcessStatus('error', errors)
-  })
+      if (allFreshPosts.length === 0 && errors.length === 0) {
+        state.updatingProcess = newProcessStatus('idle')
+        return
+      }
+      state.posts = [...allFreshPosts, ...state.posts]
+      errors.length === 0
+        ? state.updatingProcess = newProcessStatus('success')
+        : state.updatingProcess = newProcessStatus('error', errors)
+    })
 }
 
 const autoUpdate = () => {
   try {
     updateFeedsAndPosts()
-  } finally {
+  }
+  finally {
     setTimeout(() => autoUpdate(), 5000)
   }
 }

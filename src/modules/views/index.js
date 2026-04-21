@@ -4,7 +4,7 @@ import renderFeeds from './feeds'
 import { renderPosts, renderPostPreviewModal } from './posts'
 import { state, subscribe } from '../../app/state'
 
-const watchForStateChanges = (elements) => subscribe(state, (ops) => {
+const watchForStateChanges = elements => subscribe(state, (ops) => {
   ops.forEach((op) => {
     const [, path, value, prevValue] = op
     const pathString = path.join('.')

@@ -1,4 +1,4 @@
-import { i18nextInstance as i18 } from "../../app/i18"
+import { i18nextInstance as i18 } from '../../app/i18'
 
 const makeForm = () => {
   const section = document.createElement('section')
@@ -102,7 +102,7 @@ const makePostPreviewModal = () => {
       </div>
     </div>
   `
-  
+
   return dialog
 }
 

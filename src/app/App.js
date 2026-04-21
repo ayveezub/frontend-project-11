@@ -27,7 +27,7 @@ export default () => {
       title: document.getElementById('modal-title'),
       text: document.getElementById('modal-body-text'),
       link: document.getElementById('modal-link'),
-    }
+    },
   }
 
   Object.entries(elements.fields).forEach(([fieldName, fieldElement]) => {
@@ -54,7 +54,7 @@ export default () => {
     e.preventDefault()
     if (state.updatingProcess.state === 'updating') return
     if (!state.form.valid) return
-  
+
     const data = { url: state.form.fields.url }
     const newFeed = {
       feedUrl: data.url,

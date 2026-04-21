@@ -11,7 +11,7 @@ const validateFields = () => {
       name: 'is-unique-url',
       skipAbsent: true,
       message: () => i18.t('validation.custom.uniqueURL'),
-      test: (value) => !state.hasFeed(value),
+      test: value => !state.hasFeed(value),
     }),
   })
 
